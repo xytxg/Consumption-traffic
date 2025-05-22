@@ -1,13 +1,11 @@
 #!/bin/bash
 (apt update && apt install -y lsof) > /dev/null 2>&1
 
-service=$(lsof -i :80 | awk 'NR==2 {print $1}')
+listen_service=$(lsof -i :80 | grep LISTEN | awk '{print $1}' | head -n 1)
 
-if [ ! -z "$service" ]; then
-    if [ "$service" != "nginx" ]; then
-        echo "80端口被$service占用，请将其暂停后再运行此脚本"
-        exit 1
-    fi
+if [ ! -z "$listen_service" ] && [ "$listen_service" != "nginx" ]; then
+    echo "80端口被 $listen_service 占用，请将其暂停后再运行此脚本"
+    exit 1
 fi
 
 echo "温馨提示!"
